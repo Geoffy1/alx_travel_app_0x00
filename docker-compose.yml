@@ -1,0 +1,43 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  web:
+    build: . # Build the 'web' service image using the Dockerfile in the current directory
+    # The command to run when the web service container starts.
+    # It waits for the DB, runs migrations, creates a superuser, and then runs the seeder.
+    # The 'runserver' command is commented out for Milestone 2 as it's not strictly required
+    # by the prompt, but it's good for verification later.
+    command: sh -c "python alx_travel_app/manage.py wait_for_db && \
+                    python alx_travel_app/manage.py migrate && \
+                    python alx_travel_app/manage.py createsuperuser --noinput --username admin --email admin@example.com || true && \
+                    python alx_travel_app/manage.py seed"
+                    # python alx_travel_app/manage.py runserver 0.0.0.0:8000" # Uncomment for local testing later
+    volumes:
+      - .:/code # Mount the current host project directory into /code in the container
+    ports:
+      - "8000:8000" # Map host port 8000 to container port 8000 (only active if runserver is uncommented)
+    environment:
+      # Pass environment variables from .env to the web container
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=${DEBUG}
+    depends_on:
+      - db # Ensure the 'db' service starts before 'web'
+
+  db:
+    image: postgres:13 # Use the official PostgreSQL 13 Docker image
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/ # Persistent volume for database data
+    environment:
+      # Pass database credentials to the PostgreSQL container
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432" # Map host port 5432 to container port 5432 (for optional direct access from host)
+
+volumes:
+  postgres_data: # Define the named volume for PostgreSQL data persistence
