@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-# Although not required for Milestone 2, ReviewSerializer is included
+# Although not required for Milestone 2, ReviewSerializer included
 # because ListingSerializer uses it for nested representation.
 class ReviewSerializer(serializers.ModelSerializer):
     """
