@@ -1,12 +1,11 @@
-# alx_travel_app/listings/serializers.py
-
 from rest_framework import serializers
 from .models import Listing, Booking, Review
 from django.contrib.auth import get_user_model
 
+
 User = get_user_model()
 
-# Although not explicitly required for Milestone 2, ReviewSerializer is included
+# Although not required for Milestone 2, ReviewSerializer is included
 # because ListingSerializer uses it for nested representation.
 class ReviewSerializer(serializers.ModelSerializer):
     """
